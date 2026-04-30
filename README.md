@@ -11,7 +11,7 @@ A full MVP e-commerce platform built with .NET 8, ASP.NET Core MVC, Entity Frame
 | `EcommercePlatform.Web` | Main storefront + admin panel |
 | `EcommercePlatform.InventoryScanner` | Mobile QR scanner for delivery/returns |
 
-
+   
 ## Setup
 
 ### Prerequisites
