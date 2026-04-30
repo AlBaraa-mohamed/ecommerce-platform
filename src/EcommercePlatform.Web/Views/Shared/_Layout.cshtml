@@ -4,55 +4,104 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EcommercePlatform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/storefront.css" />
+    <link rel="stylesheet" href="~/css/luxury-1999.css" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-bottom: 2px solid #d4af37;">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">&#128722; EcommercePlatform</a>
+            <a class="navbar-brand fw-bold" href="/" style="font-size: 1.8rem; color: #d4af37; letter-spacing: 2px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
+                <span style="font-family: 'Cinzel', serif; font-weight: 700;">1999</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Cart"><i class="bi bi-cart"></i> Cart</a></li>
+                    <li class="nav-item"><a class="nav-link fw-500" href="/" style="color: #e0e0e0;">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link fw-500" href="/#shoes-section" style="color: #e0e0e0;">Footwear</a></li>
+                    <li class="nav-item"><a class="nav-link fw-500" href="/#clothing-section" style="color: #e0e0e0;">Clothing</a></li>
                 </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item me-3">
+                        <a class="nav-link position-relative" href="/Home/Cart">
+                            <i class="bi bi-cart3" style="font-size: 1.3rem; color: #d4af37;"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background: #d4af37; color: #1a1a2e; font-size: 0.65rem;">
+                                0
+                            </span>
+                        </a>
+                    </li>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         @if (User.IsInRole("Admin") || User.IsInRole("SocialStaff"))
                         {
-                            <li class="nav-item"><a class="nav-link" href="/Admin/Dashboard">Admin</a></li>
+                            <li class="nav-item"><a class="nav-link btn btn-sm px-3" href="/Admin/Dashboard" style="background: #d4af37; color: #1a1a2e; border: none; font-weight: 600;">Admin Panel</a></li>
                         }
-                        <li class="nav-item">
+                        <li class="nav-item ms-2">
                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-link nav-link">Logout (@User.Identity.Name)</button>
+                                <button type="submit" class="btn btn-link nav-link" style="color: #e0e0e0;">Logout (@User.Identity.Name)</button>
                             </form>
                         </li>
                     }
                     else
                     {
-                        <li class="nav-item"><a class="nav-link" href="/Account/Login">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Account/Login" style="color: #d4af37; font-weight: 600;">Login</a></li>
                     }
                 </ul>
             </div>
         </div>
     </nav>
-    <main class="py-4">
-        <div class="container">
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-            }
-            @RenderBody()
-        </div>
+    <main>
+        @if (TempData["Success"] != null)
+        {
+            <div class="container">
+                <div class="alert alert-success alert-dismissible fade show mt-3">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        }
+        @RenderBody()
     </main>
-    <footer class="bg-dark text-white text-center py-3 mt-4">
-        <div class="container"><small>&copy; 2024 EcommercePlatform</small></div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold" style="color: #d4af37; font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 2px;">1999</h5>
+                    <p class="text-white-50">Premium footwear and fashion for the modern lifestyle.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/">Shop</a></li>
+                        <li><a href="/#shoes-section">Footwear</a></li>
+                        <li><a href="/#clothing-section">Clothing</a></li>
+                        <li><a href="/Home/Cart">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold">Contact</h6>
+                    <p class="text-white-50">
+                        <i class="bi bi-envelope"></i> info@1999store.com<br>
+                        <i class="bi bi-telephone"></i> +1 (555) 123-4567
+                    </p>
+                </div>
+            </div>
+            <hr style="border-color: rgba(212, 175, 55, 0.3);">
+            <div class="text-center">
+                <small>&copy; 2024 <span style="color: #d4af37; font-weight: 600;">1999</span>. All rights reserved.</small>
+            </div>
+        </div>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/storefront.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

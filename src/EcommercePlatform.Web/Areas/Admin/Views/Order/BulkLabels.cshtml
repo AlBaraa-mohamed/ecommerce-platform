@@ -1,0 +1,163 @@
+@model List<EcommercePlatform.Domain.Entities.Order>
+@{
+    ViewData["Title"] = "Bulk Shipping Labels";
+    Layout = null;
+    var qrCodes = ViewBag.QRCodes as Dictionary<int, string>;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Bulk Shipping Labels - @Model.Count Labels</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <style>
+        @@media print {
+            .no-print { display: none; }
+            .page-break { page-break-after: always; }
+            body { margin: 0; padding: 0; }
+            .label-box { margin: 0; max-width: 100%; }
+        }
+
+        @@page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        .label-box {
+            border: 2px solid #000;
+            padding: 20px;
+            max-width: 100%;
+            margin: 0 auto 20px auto;
+            background: white;
+        }
+
+        .label-header {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: -20px -20px 15px -20px;
+            border-bottom: 2px solid #000;
+        }
+
+        body {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print text-center bg-white py-3 mb-3 shadow-sm sticky-top">
+        <h4 class="mb-2">Bulk Printing: @Model.Count Shipping Labels</h4>
+        <button onclick="window.print()" class="btn btn-primary btn-lg">
+            <i class="bi bi-printer"></i> Print All Labels
+        </button>
+        <a href="/Admin/Order" class="btn btn-secondary ms-2">Back to Orders</a>
+    </div>
+
+    <div class="container-fluid">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var order = Model[i];
+            var isLast = i == Model.Count - 1;
+
+            <div class="label-box @(!isLast ? "page-break" : "")">
+                <div class="label-header">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h5 class="mb-0">SHIPPING LABEL @(i + 1) of @Model.Count</h5>
+                        </div>
+                        <div class="col-4 text-end">
+                            <strong>Order: @order.OrderNumber</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-7">
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted mb-1">Ship To:</h6>
+                            <div style="font-size: 1.1rem; line-height: 1.6;">
+                                <strong style="font-size: 1.2rem;">@order.CustomerName</strong><br />
+                                <i class="bi bi-telephone"></i> @order.CustomerPhone<br />
+                                @order.ShippingAddress<br />
+                                <strong>@order.ShippingCity, @order.ShippingState @order.ShippingPostalCode</strong><br />
+                                @order.ShippingCountry
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6 class="text-uppercase text-muted mb-2">Order Contents:</h6>
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>SKU</th>
+                                        <th class="text-center" style="width: 80px;">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var line in order.LineItems)
+                                    {
+                                        <tr>
+                                            <td><strong>@line.ProductNameSnapshot</strong></td>
+                                            <td><code>@line.SKUSnapshot</code></td>
+                                            <td class="text-center"><span class="badge bg-primary">@line.OrderedQuantity</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Order Date: @order.CreatedAt.ToString("MMM dd, yyyy HH:mm") | 
+                                Status: <strong>@order.Status</strong>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="col-5 text-center border-start">
+                        @if (qrCodes != null && qrCodes.ContainsKey(order.Id))
+                        {
+                            <div class="mb-2">
+                                <img src="data:image/png;base64,@qrCodes[order.Id]" 
+                                     class="img-fluid" 
+                                     style="max-width: 280px; border: 1px solid #dee2e6; padding: 10px; background: white;" 
+                                     alt="QR Code" />
+                            </div>
+                            <div style="font-family: monospace; font-size: 1.1rem; font-weight: bold;">
+                                @order.OrderNumber
+                            </div>
+                        }
+
+                        <div class="mt-4 p-3 bg-light border">
+                            <div class="text-muted small mb-1">Total Items</div>
+                            <div class="h3 mb-0">@order.LineItems.Sum(l => l.OrderedQuantity)</div>
+                        </div>
+
+                        <div class="mt-3 p-2 bg-warning bg-opacity-10 border border-warning">
+                            <small><i class="bi bi-exclamation-triangle"></i> Handle with Care</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="no-print text-center py-4">
+        <button onclick="window.print()" class="btn btn-primary btn-lg">
+            <i class="bi bi-printer"></i> Print All @Model.Count Labels
+        </button>
+        <a href="/Admin/Order" class="btn btn-secondary btn-lg ms-2">Back to Orders</a>
+    </div>
+
+    <script>
+        // Auto-open print dialog on page load
+        window.onload = function() {
+            // Give the page a moment to fully render before printing
+            setTimeout(function() {
+                // Uncomment the line below if you want auto-print
+                // window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,37 +1,143 @@
 @model EcommercePlatform.Domain.Entities.Product
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = Model.Name + " - 1999";
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Shop</a></li>
-        <li class="breadcrumb-item active">@Model.Name</li>
-    </ol>
-</nav>
+<section class="product-detail-section" style="background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);">
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb" style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2);">
+                <li class="breadcrumb-item"><a href="/" style="color: var(--luxury-gold);">Shop</a></li>
+                <li class="breadcrumb-item"><a href="/#products" style="color: var(--luxury-gold);">Products</a></li>
+                <li class="breadcrumb-item active" style="color: var(--luxury-text);">@Model.Name</li>
+            </ol>
+        </nav>
 
-<div class="row">
-    <div class="col-md-5">
-        <img src="@Model.PrimaryImageUrl" class="img-fluid rounded shadow" alt="@Model.Name" onerror="this.src='https://via.placeholder.com/500x500?text=No+Image'">
+        <div class="row g-5">
+            <div class="col-md-6">
+                <div class="product-detail-image">
+                    <img src="@(string.IsNullOrEmpty(Model.PrimaryImageUrl) ? "https://placehold.co/600x600/16213e/d4af37?text=" + Uri.EscapeDataString("✨") : Model.PrimaryImageUrl)"
+                         class="img-fluid rounded-3 shadow-lg" 
+                         alt="@Model.Name"
+                         style="width: 100%; object-fit: cover;">
+                    @if (Model.Available <= 3 && Model.Available > 0)
+                    {
+                        <div class="stock-indicator low-stock">
+                            <i class="bi bi-exclamation-triangle"></i> Only @Model.Available left!
+                        </div>
+                    }
+                    else if (Model.Available == 0)
+                    {
+                        <div class="stock-indicator out-of-stock">
+                            <i class="bi bi-x-circle"></i> Out of Stock
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="product-detail-info">
+                    <div class="product-meta mb-3">
+                        <span class="product-type-badge">@Model.Type</span>
+                        @if (Model.Size.HasValue)
+                        {
+                            <span class="product-size-badge">
+                                <i class="bi bi-rulers"></i> EU Size @Model.Size
+                            </span>
+                        }
+                        <span class="product-sku">SKU: @Model.SKU</span>
+                    </div>
+
+                    <h1 class="product-detail-title">@Model.Name</h1>
+
+                    <div class="product-price-section">
+                        <h2 class="product-detail-price">$@Model.Price.ToString("N2")</h2>
+                        @if (Model.Available > 0)
+                        {
+                            <div class="availability-badge in-stock">
+                                <i class="bi bi-check-circle-fill"></i> In Stock
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="availability-badge sold-out">
+                                <i class="bi bi-x-circle-fill"></i> Sold Out
+                            </div>
+                        }
+                    </div>
+
+                    <div class="product-description">
+                        <p>@(string.IsNullOrEmpty(Model.Description) ? "No description available for this product." : Model.Description)</p>
+                    </div>
+
+                    @if (Model.Available > 0)
+                    {
+                        <div class="product-actions">
+                            <form asp-action="AddToCart" asp-controller="Home" method="post" class="add-to-cart-section">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <div class="quantity-selector">
+                                    <label class="form-label fw-600">Quantity</label>
+                                    <div class="quantity-input-group">
+                                        <button type="button" class="quantity-btn" onclick="decrementQty()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.Available" class="quantity-input" />
+                                        <button type="button" class="quantity-btn" onclick="incrementQty(@Model.Available)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-add-to-cart btn-lg w-100 mt-3">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="out-of-stock-message">
+                            <i class="bi bi-inbox"></i>
+                            <p>This item is currently out of stock. Check back soon!</p>
+                        </div>
+                    }
+
+                    <div class="product-features mt-4">
+                        <div class="feature-item">
+                            <i class="bi bi-truck"></i>
+                            <span>Free Shipping on orders over $50</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>30-day return policy</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Quality guaranteed</span>
+                        </div>
+                    </div>
+
+                    <a href="/" class="btn btn-outline-dark mt-4">
+                        <i class="bi bi-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-7">
-        <h1>@Model.Name</h1>
-        <p class="text-muted">SKU: @Model.SKU</p>
-        <p>@Model.Description</p>
-        <h3 class="text-primary">$@Model.Price.ToString("F2")</h3>
-        @if (Model.Available > 0)
-        {
-            <p class="text-success"><i class="bi bi-check-circle"></i> In Stock (@Model.Available available)</p>
-            <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-flex gap-2 align-items-center mt-3">
-                <input type="hidden" name="productId" value="@Model.Id" />
-                <input type="number" name="quantity" value="1" min="1" max="@Model.Available" class="form-control" style="width:80px" />
-                <button type="submit" class="btn btn-primary"><i class="bi bi-cart-plus"></i> Add to Cart</button>
-            </form>
+</section>
+
+@section Scripts {
+    <script>
+        function incrementQty(max) {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value) < max) {
+                input.value = parseInt(input.value) + 1;
+            }
         }
-        else
-        {
-            <p class="text-danger"><i class="bi bi-x-circle"></i> Out of Stock</p>
+
+        function decrementQty() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
         }
-        <a href="/" class="btn btn-outline-secondary mt-3">Back to Shop</a>
-    </div>
-</div>
+    </script>
+}

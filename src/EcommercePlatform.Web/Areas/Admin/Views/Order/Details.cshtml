@@ -1,6 +1,7 @@
 @model EcommercePlatform.Domain.Entities.Order
 @{
     ViewData["Title"] = $"Order {Model.OrderNumber}";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="d-flex justify-content-between mb-3">

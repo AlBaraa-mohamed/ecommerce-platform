@@ -1,48 +1,111 @@
-@model List<EcommercePlatform.Domain.Entities.Product>
+@model IEnumerable<EcommercePlatform.Domain.Entities.Product>
 @{
     ViewData["Title"] = "Products";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex justify-content-between mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-box-seam"></i> Products</h2>
-    <a href="/Admin/Product/Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>SKU</th>
-                <th>Price</th>
-                <th>On Hand</th>
-                <th>Reserved</th>
-                <th>Available</th>
-                <th>Active</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model)
-            {
-                <tr>
-                    <td><img src="@p.PrimaryImageUrl" width="50" height="50" style="object-fit:cover" onerror="this.src='https://via.placeholder.com/50'" /></td>
-                    <td>@p.Name</td>
-                    <td><code>@p.SKU</code></td>
-                    <td>$@p.Price.ToString("F2")</td>
-                    <td>@p.OnHand</td>
-                    <td>@p.Reserved</td>
-                    <td>@p.Available</td>
-                    <td>@(p.IsActive ? "✅" : "❌")</td>
-                    <td>
-                        <a href="/Admin/Product/Edit/@p.Id" class="btn btn-sm btn-outline-warning">Edit</a>
-                        <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this product?')">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Image</th>
+                        <th>SKU</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Price</th>
+                        <th>On Hand</th>
+                        <th>Status</th>
+                        <th style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "https://placehold.co/60x60/e9ecef/6c757d?text=No+Image" : product.PrimaryImageUrl)" 
+                                     alt="@product.Name" 
+                                     class="img-thumbnail" 
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                            </td>
+                            <td><code>@product.SKU</code></td>
+                            <td>@product.Name</td>
+                            <td>
+                                <span class="badge bg-secondary">@product.Type</span>
+                            </td>
+                            <td>
+                                @if (product.Size.HasValue)
+                                {
+                                    <span class="badge bg-info">@product.Size</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>$@product.Price.ToString("N2")</td>
+                            <td>
+                                <span class="badge @(product.OnHand > 10 ? "bg-success" : product.OnHand > 0 ? "bg-warning" : "bg-danger")">
+                                    @product.OnHand
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(product.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(product.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-info" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" title="Delete" 
+                                            onclick="deleteProduct(@product.Id, '@product.Name')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-2">No products found. <a asp-action="Create">Create your first product</a>.</p>
+            </div>
+        }
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        function deleteProduct(id, name) {
+            if (confirm(`Are you sure you want to delete "${name}"?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Delete")';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+}

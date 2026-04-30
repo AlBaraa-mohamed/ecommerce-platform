@@ -29,6 +29,12 @@ public class ProductController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(Product product, IFormFile? imageFile)
     {
+        if (product == null)
+        {
+            TempData["Error"] = "Failed to process the form submission. Please try again.";
+            return RedirectToAction("Index");
+        }
+
         if (imageFile != null)
         {
             var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
@@ -55,6 +61,12 @@ public class ProductController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(Product product, IFormFile? imageFile)
     {
+        if (product == null)
+        {
+            TempData["Error"] = "Failed to process the form submission. Please try again.";
+            return RedirectToAction("Index");
+        }
+
         var existing = await _productService.GetProductAsync(product.Id);
         if (existing == null) return NotFound();
 

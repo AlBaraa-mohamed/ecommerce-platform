@@ -49,15 +49,21 @@ public class AccountController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Register(string email, string password, string role)
+    public async Task<IActionResult> Register(string email, string password, string confirmPassword, string role)
     {
+        if (password != confirmPassword)
+        {
+            ModelState.AddModelError("", "Passwords do not match.");
+            return View();
+        }
+
         var user = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
         var result = await _userManager.CreateAsync(user, password);
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, role);
-            TempData["Success"] = "User created successfully.";
-            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            TempData["Success"] = $"User '{email}' created successfully with role '{role}'.";
+            return RedirectToAction("Register"); // Stay on page to create more users
         }
         foreach (var error in result.Errors)
             ModelState.AddModelError("", error.Description);

@@ -13,4 +13,16 @@ public class Product
     public int OnHand { get; set; }
     public int Reserved { get; set; }
     public int Available => OnHand - Reserved;
+    public ProductType Type { get; set; } = ProductType.General;
+    public int? Size { get; set; } // For shoes: 38-45
+}
+
+public enum ProductType
+{
+    General = 0,
+    Clothing = 1,
+    Shoes = 2,
+    Electronics = 3,
+    Accessories = 4,
+    Books = 5
 }

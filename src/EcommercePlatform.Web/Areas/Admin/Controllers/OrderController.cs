@@ -38,6 +38,29 @@ public class OrderController : Controller
         return RedirectToAction("Details", new { id });
     }
 
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BulkUpdateStatus([FromBody] BulkStatusUpdateRequest request)
+    {
+        if (request.OrderIds == null || !request.OrderIds.Any())
+        {
+            return BadRequest("No orders selected");
+        }
+
+        if (!Enum.TryParse<OrderStatus>(request.NewStatus, out var status))
+        {
+            return BadRequest("Invalid status");
+        }
+
+        var userId = User.Identity?.Name ?? "";
+        foreach (var orderId in request.OrderIds)
+        {
+            await _orderService.UpdateOrderStatusAsync(orderId, status, userId, $"Bulk update to {status}");
+        }
+
+        return Ok(new { message = $"Updated {request.OrderIds.Count} order(s)" });
+    }
+
     public async Task<IActionResult> Label(int id)
     {
         var order = await _orderService.GetOrderAsync(id);
@@ -50,6 +73,37 @@ public class OrderController : Controller
         ViewBag.QRCodeBase64 = Convert.ToBase64String(qrBytes);
 
         return View(order);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> BulkPrintLabels([FromBody] BulkPrintRequest request)
+    {
+        if (request.OrderIds == null || !request.OrderIds.Any())
+        {
+            return BadRequest("No orders selected");
+        }
+
+        var orders = new List<Order>();
+        var qrCodes = new Dictionary<int, string>();
+
+        foreach (var orderId in request.OrderIds)
+        {
+            var order = await _orderService.GetOrderAsync(orderId);
+            if (order != null)
+            {
+                orders.Add(order);
+
+                // Generate QR code for each order
+                using var qrGenerator = new QRCodeGenerator();
+                var qrData = qrGenerator.CreateQrCode(order.OrderNumber, QRCodeGenerator.ECCLevel.Q);
+                using var qrCode = new PngByteQRCode(qrData);
+                var qrBytes = qrCode.GetGraphic(20);
+                qrCodes[order.Id] = Convert.ToBase64String(qrBytes);
+            }
+        }
+
+        ViewBag.QRCodes = qrCodes;
+        return View("BulkLabels", orders);
     }
 
     public async Task<IActionResult> ExportExcel()
@@ -116,4 +170,15 @@ public class OrderController : Controller
         TempData["Success"] = "Order created.";
         return RedirectToAction("Index");
     }
+}
+
+public class BulkStatusUpdateRequest
+{
+    public List<int> OrderIds { get; set; } = new();
+    public string NewStatus { get; set; } = string.Empty;
+}
+
+public class BulkPrintRequest
+{
+    public List<int> OrderIds { get; set; } = new();
 }

@@ -1,41 +1,152 @@
 @{
     ViewData["Title"] = "Register User";
+    // Use admin layout if user is admin
+    if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    }
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow">
-            <div class="card-header"><h4>Register New User</h4></div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Register New User</h4>
+            </div>
             <div class="card-body">
-                @if (!ViewData.ModelState.IsValid)
+                @if (TempData["Success"] != null)
                 {
-                    <div class="alert alert-danger">
-                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                        {
-                            <div>@error.ErrorMessage</div>
-                        }
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle"></i> @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
                 <form asp-action="Register" method="post">
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" required />
+                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" 
+                                   name="email" 
+                                   class="form-control" 
+                                   placeholder="user@example.com"
+                                   required 
+                                   autofocus />
+                        </div>
+                        <small class="text-muted">This will be used as the username</small>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required />
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" 
+                                   name="password" 
+                                   class="form-control" 
+                                   id="passwordInput"
+                                   placeholder="Enter secure password"
+                                   required 
+                                   minlength="8" />
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    onclick="togglePassword()">
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Minimum 8 characters, must include digits</small>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Role</label>
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            <input type="password" 
+                                   name="confirmPassword" 
+                                   class="form-control" 
+                                   id="confirmPasswordInput"
+                                   placeholder="Re-enter password"
+                                   required />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">User Role <span class="text-danger">*</span></label>
                         <select name="role" class="form-select" required>
-                            <option value="Admin">Admin</option>
-                            <option value="SocialStaff">Social Staff</option>
-                            <option value="InventoryStaff">Inventory Staff</option>
+                            <option value="">Select a role...</option>
+                            <option value="Admin">Admin - Full access to all features</option>
+                            <option value="SocialStaff" selected>Social Staff - Manage orders and customers</option>
+                            <option value="InventoryStaff">Inventory Staff - Manage stock and products</option>
                         </select>
+                        <small class="text-muted">Choose the appropriate role for this user</small>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Create User</button>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-check"></i> Create User Account
+                        </button>
+                        <a href="/Admin/Dashboard" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                    </div>
                 </form>
+            </div>
+        </div>
+
+        <div class="card mt-3 bg-light">
+            <div class="card-body">
+                <h6><i class="bi bi-info-circle"></i> User Roles Explained:</h6>
+                <ul class="small mb-0">
+                    <li><strong>Admin:</strong> Full system access including user management</li>
+                    <li><strong>Social Staff:</strong> Can manage orders, view customers, update order status</li>
+                    <li><strong>Inventory Staff:</strong> Can manage products, stock levels, and inventory movements</li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
+
+        // Password confirmation validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('passwordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match. Please try again.');
+                return false;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,611 @@
+/* 1999 Luxury Brand Theme - Dark & Gold */
+
+:root {
+    --luxury-dark: #1a1a2e;
+    --luxury-darker: #16213e;
+    --luxury-gold: #d4af37;
+    --luxury-gold-light: #f4d03f;
+    --luxury-gold-dark: #b8941f;
+    --luxury-text: #e0e0e0;
+    --luxury-text-dim: #a0a0a0;
+}
+
+/* === WAVY BACKGROUND PATTERN (inspired by 1999 image) === */
+body {
+    background: #0f1419;
+}
+
+.hero-section-1999,
+.category-section,
+.products-section,
+.product-detail-section {
+    position: relative;
+}
+
+/* Wavy pattern overlay */
+.hero-section-1999::before,
+.category-section::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0.03;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 35px,
+            rgba(212, 175, 55, 0.1) 35px,
+            rgba(212, 175, 55, 0.1) 36px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 35px,
+            rgba(212, 175, 55, 0.1) 35px,
+            rgba(212, 175, 55, 0.1) 36px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Sparkle/star effects */
+@keyframes sparkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.hero-section-1999::after {
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+/* === 1999 HERO SECTION === */
+.hero-section-1999 {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section-1999::before {
+    content: '';
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -400px;
+    right: -300px;
+    animation: floatGlow 8s ease-in-out infinite;
+}
+
+.hero-section-1999::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+@keyframes floatGlow {
+    0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.3;
+    }
+    50% { 
+        transform: translate(-30px, -30px) scale(1.1);
+        opacity: 0.5;
+    }
+}
+
+/* === LUXURY LOGO === */
+.luxury-logo-container {
+    position: relative;
+    z-index: 10;
+}
+
+.golden-circle {
+    width: 180px;
+    height: 180px;
+    border: 4px solid var(--luxury-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    box-shadow: 
+        0 0 30px rgba(212, 175, 55, 0.3),
+        inset 0 0 30px rgba(212, 175, 55, 0.1);
+    animation: goldenPulse 3s ease-in-out infinite;
+}
+
+@keyframes goldenPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(212, 175, 55, 0.3),
+            inset 0 0 30px rgba(212, 175, 55, 0.1);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 50px rgba(212, 175, 55, 0.5),
+            inset 0 0 50px rgba(212, 175, 55, 0.2);
+        transform: scale(1.05);
+    }
+}
+
+.brand-1999 {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--luxury-gold);
+    text-shadow: 
+        0 0 20px rgba(212, 175, 55, 0.6),
+        0 0 40px rgba(212, 175, 55, 0.4),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 4px;
+}
+
+/* === LUXURY HERO ELEMENTS === */
+.hero-badge-luxury {
+    display: inline-block;
+    padding: 10px 25px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+    color: var(--luxury-gold);
+    border: 2px solid var(--luxury-gold);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: luxuryPulse 2.5s infinite;
+}
+
+@keyframes luxuryPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    }
+}
+
+.hero-title-luxury {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 25px;
+    color: var(--luxury-text);
+    font-family: 'Cinzel', serif;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.text-gradient-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+}
+
+.hero-subtitle-luxury {
+    font-size: 1.2rem;
+    color: var(--luxury-text-dim);
+    margin-bottom: 35px;
+    max-width: 550px;
+    line-height: 1.8;
+}
+
+/* === LUXURY BUTTONS === */
+.btn-luxury {
+    background: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-light) 100%);
+    color: var(--luxury-dark);
+    border: none;
+    border-radius: 50px;
+    padding: 14px 35px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-luxury:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(212, 175, 55, 0.6);
+    background: linear-gradient(135deg, var(--luxury-gold-light) 0%, var(--luxury-gold) 100%);
+    color: var(--luxury-dark);
+}
+
+.btn-luxury-outline {
+    background: transparent;
+    color: var(--luxury-gold);
+    border: 2px solid var(--luxury-gold);
+    border-radius: 50px;
+    padding: 12px 35px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-luxury-outline:hover {
+    background: var(--luxury-gold);
+    color: var(--luxury-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(212, 175, 55, 0.6);
+}
+
+/* === LUXURY STATS === */
+.stat-item-luxury {
+    text-align: center;
+}
+
+.stat-item-luxury h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--luxury-gold);
+    margin-bottom: 5px;
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.stat-item-luxury p {
+    font-size: 0.9rem;
+    color: var(--luxury-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* === LUXURY FLOATING CARDS === */
+.hero-image-wrapper-luxury {
+    position: relative;
+    min-height: 400px;
+}
+
+.floating-card-luxury {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(26, 26, 46, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    padding: 18px 28px;
+    border-radius: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: var(--luxury-gold);
+    animation: floatCardLuxury 4s ease-in-out infinite;
+}
+
+.floating-card-luxury i {
+    font-size: 1.8rem;
+    color: var(--luxury-gold);
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+}
+
+.card-1 {
+    top: 5%;
+    right: 15%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    top: 45%;
+    right: 5%;
+    animation-delay: 1.3s;
+}
+
+.card-3 {
+    bottom: 15%;
+    right: 20%;
+    animation-delay: 2.6s;
+}
+
+@keyframes floatCardLuxury {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        box-shadow: 
+            0 10px 40px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(212, 175, 55, 0.2);
+    }
+    50% { 
+        transform: translateY(-20px) rotate(2deg);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.6),
+            0 0 30px rgba(212, 175, 55, 0.4);
+    }
+}
+
+/* === OVERRIDE EXISTING STYLES FOR LUXURY THEME === */
+.hero-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.category-section {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 50%, #0f1419 100%);
+    padding: 100px 0;
+}
+
+.section-title {
+    color: var(--luxury-gold);
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.section-subtitle {
+    color: var(--luxury-text-dim);
+}
+
+.category-card {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(26, 26, 46, 0.95) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.category-card:hover {
+    border-color: var(--luxury-gold);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(212, 175, 55, 0.4);
+}
+
+.category-card h3,
+.category-card p {
+    color: var(--luxury-gold);
+}
+
+.category-card i {
+    color: var(--luxury-gold);
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+}
+
+/* === PRODUCTS SECTION LUXURY === */
+.products-section {
+    background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
+}
+
+.product-card {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+    border-color: var(--luxury-gold);
+    box-shadow: 
+        0 15px 50px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(212, 175, 55, 0.3);
+}
+
+.product-image-wrapper {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+}
+
+.product-title a {
+    color: var(--luxury-text);
+}
+
+.product-title a:hover {
+    color: var(--luxury-gold);
+}
+
+.product-price {
+    color: var(--luxury-gold);
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn-add-cart {
+    background: var(--luxury-gold);
+    color: var(--luxury-dark);
+}
+
+.btn-add-cart:hover:not(:disabled) {
+    background: var(--luxury-gold-light);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5);
+}
+
+.product-category {
+    color: var(--luxury-text-dim);
+}
+
+.size-badge {
+    background: var(--luxury-gold);
+    color: var(--luxury-dark);
+}
+
+/* === FOOTER LUXURY === */
+footer {
+    background: linear-gradient(135deg, #16213e 0%, #0f1419 100%);
+    border-top: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+footer h5, footer h6 {
+    color: var(--luxury-gold);
+}
+
+footer a:hover {
+    color: var(--luxury-gold-light);
+}
+
+/* === NAVBAR ENHANCEMENTS === */
+.navbar .nav-link::after {
+    background: var(--luxury-gold);
+}
+
+.navbar .nav-link:hover {
+    color: var(--luxury-gold) !important;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .golden-circle {
+        width: 140px;
+        height: 140px;
+    }
+
+    .brand-1999 {
+        font-size: 2.5rem;
+    }
+
+    .hero-title-luxury {
+        font-size: 2.5rem;
+    }
+
+    .floating-card-luxury {
+        padding: 12px 18px;
+        font-size: 0.9rem;
+    }
+
+    .floating-card-luxury i {
+        font-size: 1.3rem;
+    }
+
+    .card-3 {
+        display: none;
+    }
+}
+
+/* === PRODUCT DETAIL LUXURY ENHANCEMENTS === */
+.product-detail-section {
+    background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
+}
+
+.product-detail-image img {
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+}
+
+.product-detail-title {
+    color: var(--luxury-gold);
+    font-family: 'Cinzel', serif;
+}
+
+.product-type-badge {
+    background: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-light) 100%);
+    color: var(--luxury-dark);
+}
+
+.product-size-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--luxury-gold);
+    border: 1px solid var(--luxury-gold);
+}
+
+.product-sku {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--luxury-gold);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.product-detail-price {
+    color: var(--luxury-gold);
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.product-description {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(26, 26, 46, 0.5) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    color: var(--luxury-text);
+}
+
+.quantity-input-group {
+    border-color: var(--luxury-gold);
+    background: rgba(26, 26, 46, 0.5);
+}
+
+.quantity-btn {
+    background: rgba(26, 26, 46, 0.8);
+    color: var(--luxury-gold);
+}
+
+.quantity-btn:hover {
+    background: var(--luxury-gold);
+    color: var(--luxury-dark);
+}
+
+.quantity-input {
+    background: rgba(26, 26, 46, 0.8);
+    color: var(--luxury-gold);
+}
+
+.btn-add-to-cart {
+    background: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-light) 100%);
+    color: var(--luxury-dark);
+}
+
+.btn-add-to-cart:hover {
+    background: linear-gradient(135deg, var(--luxury-gold-light) 0%, var(--luxury-gold) 100%);
+    box-shadow: 0 10px 40px rgba(212, 175, 55, 0.5);
+}
+
+.product-features {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(26, 26, 46, 0.6) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.feature-item i {
+    color: var(--luxury-gold);
+}
+
+.feature-item span {
+    color: var(--luxury-text);
+}
+
+.availability-badge.in-stock {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--luxury-gold);
+    border: 1px solid var(--luxury-gold);
+}
+
+.stock-indicator.low-stock {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+/* === BREADCRUMB LUXURY === */
+.breadcrumb {
+    background: rgba(212, 175, 55, 0.1) !important;
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+.breadcrumb-item a {
+    color: var(--luxury-gold) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--luxury-text) !important;
+}
+
+/* === EMPTY STATE === */
+.empty-state {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+}
+
+.empty-state i {
+    color: rgba(212, 175, 55, 0.3) !important;
+}
+
+.empty-state h3 {
+    color: var(--luxury-gold);
+}
+
+.empty-state .text-muted {
+    color: var(--luxury-text-dim) !important;
+}
