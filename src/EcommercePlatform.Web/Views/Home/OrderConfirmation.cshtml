@@ -1,0 +1,61 @@
+@model EcommercePlatform.Domain.Entities.Order
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<div class="text-center py-5">
+    <i class="bi bi-check-circle-fill text-success" style="font-size:4rem"></i>
+    <h2 class="mt-3">Order Placed Successfully!</h2>
+    <p class="lead">Thank you, @Model.CustomerName!</p>
+    <p>Your order number is: <strong class="fs-4">@Model.OrderNumber</strong></p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>Order Details</h5></div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Ship To:</strong><br />
+                        @Model.CustomerName<br />
+                        @Model.ShippingAddress<br />
+                        @Model.ShippingCity, @Model.ShippingState @Model.ShippingPostalCode<br />
+                        @Model.ShippingCountry
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Contact:</strong><br />
+                        @Model.CustomerPhone<br />
+                        @Model.CustomerEmail
+                    </div>
+                </div>
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Product</th><th>SKU</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model.LineItems)
+                        {
+                            <tr>
+                                <td>@line.ProductNameSnapshot</td>
+                                <td>@line.SKUSnapshot</td>
+                                <td>@line.OrderedQuantity</td>
+                                <td>$@line.UnitPrice.ToString("F2")</td>
+                                <td>$@((line.UnitPrice * line.OrderedQuantity).ToString("F2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold">Total:</td>
+                            <td class="fw-bold">$@Model.LineItems.Sum(l => l.UnitPrice * l.OrderedQuantity).ToString("F2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="/" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+</div>

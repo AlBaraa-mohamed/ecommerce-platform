@@ -1,0 +1,24 @@
+@model EcommercePlatform.Domain.Entities.Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h2>@Model.Name</h2>
+<div class="row">
+    <div class="col-md-4">
+        <img src="@Model.PrimaryImageUrl" class="img-fluid rounded" onerror="this.src='https://via.placeholder.com/400'" />
+    </div>
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">SKU</dt><dd class="col-sm-9"><code>@Model.SKU</code></dd>
+            <dt class="col-sm-3">Price</dt><dd class="col-sm-9">$@Model.Price.ToString("F2")</dd>
+            <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@Model.Description</dd>
+            <dt class="col-sm-3">On Hand</dt><dd class="col-sm-9">@Model.OnHand</dd>
+            <dt class="col-sm-3">Reserved</dt><dd class="col-sm-9">@Model.Reserved</dd>
+            <dt class="col-sm-3">Available</dt><dd class="col-sm-9">@Model.Available</dd>
+            <dt class="col-sm-3">Active</dt><dd class="col-sm-9">@(Model.IsActive ? "Yes" : "No")</dd>
+        </dl>
+        <a href="/Admin/Product/Edit/@Model.Id" class="btn btn-warning">Edit</a>
+        <a href="/Admin/Product" class="btn btn-secondary">Back</a>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+@model List<EcommercePlatform.Domain.Entities.Product>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="d-flex justify-content-between mb-4">
+    <h2><i class="bi bi-box-seam"></i> Products</h2>
+    <a href="/Admin/Product/Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Product</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>SKU</th>
+                <th>Price</th>
+                <th>On Hand</th>
+                <th>Reserved</th>
+                <th>Available</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td><img src="@p.PrimaryImageUrl" width="50" height="50" style="object-fit:cover" onerror="this.src='https://via.placeholder.com/50'" /></td>
+                    <td>@p.Name</td>
+                    <td><code>@p.SKU</code></td>
+                    <td>$@p.Price.ToString("F2")</td>
+                    <td>@p.OnHand</td>
+                    <td>@p.Reserved</td>
+                    <td>@p.Available</td>
+                    <td>@(p.IsActive ? "✅" : "❌")</td>
+                    <td>
+                        <a href="/Admin/Product/Edit/@p.Id" class="btn btn-sm btn-outline-warning">Edit</a>
+                        <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this product?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

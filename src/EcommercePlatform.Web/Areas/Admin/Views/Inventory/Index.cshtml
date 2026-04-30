@@ -1,0 +1,85 @@
+@model List<EcommercePlatform.Domain.Entities.Product>
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<div class="d-flex justify-content-between mb-4">
+    <h2><i class="bi bi-archive"></i> Inventory</h2>
+    <a href="/Admin/Inventory/Movements" class="btn btn-outline-primary">View All Movements</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>SKU</th>
+                <th>Product</th>
+                <th>On Hand</th>
+                <th>Reserved</th>
+                <th>Available</th>
+                <th>Adjust</th>
+                <th>Movements</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td><code>@p.SKU</code></td>
+                    <td>@p.Name</td>
+                    <td>@p.OnHand</td>
+                    <td>@p.Reserved</td>
+                    <td class="@(p.Available <= 0 ? "text-danger fw-bold" : "")">@p.Available</td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#adjustModal" 
+                                    data-id="@p.Id" data-name="@p.Name">Adjust</button>
+                        }
+                    </td>
+                    <td>
+                        <a href="/Admin/Inventory/Movements?productId=@p.Id" class="btn btn-sm btn-outline-info">History</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="adjustModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-area="Admin" asp-controller="Inventory" asp-action="Adjust" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adjust Inventory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="productId" id="adjustProductId" />
+                    <p>Product: <strong id="adjustProductName"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity (positive to add, negative to subtract)</label>
+                        <input type="number" name="quantity" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <input type="text" name="notes" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Apply Adjustment</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.getElementById('adjustModal').addEventListener('show.bs.modal', function(e) {
+    document.getElementById('adjustProductId').value = e.relatedTarget.dataset.id;
+    document.getElementById('adjustProductName').textContent = e.relatedTarget.dataset.name;
+});
+</script>
+}
