@@ -26,6 +26,14 @@ jobs:
       - name: Build with dotnet
         run: dotnet build EcommercePlatform.sln --configuration Release
 
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef --version 8.0.0
+
+      - name: Run database migrations
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
+        run: dotnet-ef database update --project src/EcommercePlatform.Infrastructure --startup-project src/EcommercePlatform.Web
+
       - name: dotnet publish Web
         run: dotnet publish src/EcommercePlatform.Web/EcommercePlatform.Web.csproj -c Release -o "${{env.DOTNET_ROOT}}/web-app"
 
@@ -71,6 +79,16 @@ jobs:
           app-name: 'ecommerce-app'
           slot-name: 'Production'
           package: .
+
+      - name: Configure connection string on Azure App Service
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az webapp config connection-string set \
+              --name ecommerce-app \
+              --resource-group $(az webapp show --name ecommerce-app --query resourceGroup -o tsv) \
+              --settings DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
+              --connection-string-type SQLAzure
 
   deploy-inventory-scanner:
     runs-on: windows-latest
