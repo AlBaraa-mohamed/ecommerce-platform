@@ -88,9 +88,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_INVENTORY_SCANNER }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_INVENTORY_SCANNER }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_INVENTORY_SCANNER }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B1FDA7BC6EC94F788C1246A4967FB6A4 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A3F377FA62FC487684EFF487B8A4EF8D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D8F38CC92B4244AF886367D06F4EA920 }}
 
       - name: Deploy InventoryScanner to Azure Web App
         id: deploy-inventory-scanner-to-webapp
