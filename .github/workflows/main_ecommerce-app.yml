@@ -14,6 +14,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
+    env:
+      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,9 +32,9 @@ jobs:
         run: dotnet tool install --global dotnet-ef --version 8.0.0
 
       - name: Run database migrations
-        if: ${{ secrets.DB_CONNECTION_STRING != '' }}
+        if: ${{ env.DB_CONNECTION_STRING != '' }}
         env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
+          ConnectionStrings__DefaultConnection: ${{ env.DB_CONNECTION_STRING }}
         run: dotnet-ef database update --project src/EcommercePlatform.Infrastructure --startup-project src/EcommercePlatform.Web
 
       - name: dotnet publish Web
