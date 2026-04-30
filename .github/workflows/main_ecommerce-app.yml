@@ -30,6 +30,7 @@ jobs:
         run: dotnet tool install --global dotnet-ef --version 8.0.0
 
       - name: Run database migrations
+        if: ${{ secrets.DB_CONNECTION_STRING != '' }}
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
         run: dotnet-ef database update --project src/EcommercePlatform.Infrastructure --startup-project src/EcommercePlatform.Web
