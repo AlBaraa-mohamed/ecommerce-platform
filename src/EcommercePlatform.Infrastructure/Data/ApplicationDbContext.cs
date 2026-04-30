@@ -34,8 +34,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<OrderLineItem>(e =>
         {
-            e.HasCheckConstraint("CK_OrderLineItem_DeliveredQty", "[DeliveredQuantity] <= [OrderedQuantity]");
-            e.HasCheckConstraint("CK_OrderLineItem_ReturnedQty", "[ReturnedQuantity] <= [DeliveredQuantity]");
+            e.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_OrderLineItem_DeliveredQty", "[DeliveredQuantity] <= [OrderedQuantity]");
+                t.HasCheckConstraint("CK_OrderLineItem_ReturnedQty", "[ReturnedQuantity] <= [DeliveredQuantity]");
+            });
             e.Property(l => l.UnitPrice).HasColumnType("decimal(18,2)");
         });
     }
