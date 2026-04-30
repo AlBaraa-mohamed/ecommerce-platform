@@ -1,0 +1,277 @@
+@model List<EcommercePlatform.Domain.Entities.Order>
+@{
+    ViewData["Title"] = "Orders";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bag"></i> Orders</h2>
+    <div>
+        <a href="/Admin/Order/Create" class="btn btn-primary me-2"><i class="bi bi-plus-circle"></i> New Order</a>
+        <a href="/Admin/Order/ExportExcel" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Export Excel</a>
+    </div>
+</div>
+
+<!-- Bulk Actions Bar -->
+<div class="card mb-3" id="bulkActionsBar" style="display: none;">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <strong><span id="selectedCount">0</span> order(s) selected</strong>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-primary btn-sm" onclick="printSelectedLabels()">
+                    <i class="bi bi-printer"></i> Print Labels
+                </button>
+            </div>
+            <div class="col-auto">
+                <select class="form-select form-select-sm" id="bulkStatusChange" onchange="changeBulkStatus(this.value)">
+                    <option value="">Change Status...</option>
+                    <option value="Processing">Processing</option>
+                    <option value="PartiallyDelivered">Partially Delivered</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="PartiallyReturned">Partially Returned</option>
+                    <option value="Returned">Returned</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearSelection()">
+                    <i class="bi bi-x"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Filter -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="filterByStatus('all')">
+                All (@Model.Count)
+            </button>
+            <button type="button" class="btn btn-outline-warning btn-sm" onclick="filterByStatus('New')">
+                New (@Model.Count(o => o.Status == EcommercePlatform.Domain.Entities.OrderStatus.New))
+            </button>
+            <button type="button" class="btn btn-outline-info btn-sm" onclick="filterByStatus('Processing')">
+                Processing (@Model.Count(o => o.Status == EcommercePlatform.Domain.Entities.OrderStatus.Processing))
+            </button>
+            <button type="button" class="btn btn-outline-success btn-sm" onclick="filterByStatus('Delivered')">
+                Delivered (@Model.Count(o => o.Status == EcommercePlatform.Domain.Entities.OrderStatus.Delivered))
+            </button>
+        </div>
+        <button type="button" class="btn btn-warning btn-sm ms-3" onclick="selectAllNew()">
+            <i class="bi bi-check-all"></i> Select All New Orders
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelectAll(this)">
+                        </th>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Items</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr data-status="@order.Status">
+                            <td>
+                                <input type="checkbox" class="form-check-input order-checkbox" 
+                                       data-order-id="@order.Id" 
+                                       data-order-number="@order.OrderNumber"
+                                       onchange="updateBulkActions()">
+                            </td>
+                            <td><strong>@order.OrderNumber</strong></td>
+                            <td>@order.CustomerName</td>
+                            <td>@order.CustomerPhone</td>
+                            <td>@order.ShippingCity</td>
+                            <td>@order.LineItems.Count</td>
+                            <td>
+                                @{
+                                    var badgeClass = order.Status switch {
+                                        EcommercePlatform.Domain.Entities.OrderStatus.New => "bg-warning",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.Processing => "bg-info",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.PartiallyDelivered => "bg-primary",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.Delivered => "bg-success",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.PartiallyReturned => "bg-warning",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.Returned => "bg-secondary",
+                                        EcommercePlatform.Domain.Entities.OrderStatus.Cancelled => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@order.Status</span>
+                            </td>
+                            <td>@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="/Admin/Order/Details/@order.Id" class="btn btn-outline-primary" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Admin/Order/Label/@order.Id" target="_blank" class="btn btn-outline-secondary" title="Print Label">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-2">No orders yet. <a href="/Admin/Order/Create">Create your first order</a>.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.order-checkbox');
+            checkboxes.forEach(cb => {
+                if (cb.closest('tr').style.display !== 'none') {
+                    cb.checked = checkbox.checked;
+                }
+            });
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.order-checkbox:checked').length;
+            const bulkBar = document.getElementById('bulkActionsBar');
+            const countSpan = document.getElementById('selectedCount');
+
+            countSpan.textContent = checked;
+            bulkBar.style.display = checked > 0 ? 'block' : 'none';
+
+            // Update select all checkbox state
+            const allCheckboxes = document.querySelectorAll('.order-checkbox');
+            const visibleCheckboxes = Array.from(allCheckboxes).filter(cb => cb.closest('tr').style.display !== 'none');
+            const allChecked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+            document.getElementById('selectAll').checked = allChecked;
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            updateBulkActions();
+        }
+
+        function selectAllNew() {
+            document.querySelectorAll('.order-checkbox').forEach(cb => {
+                const row = cb.closest('tr');
+                if (row.dataset.status === 'New') {
+                    cb.checked = true;
+                }
+            });
+            updateBulkActions();
+        }
+
+        function filterByStatus(status) {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            updateBulkActions();
+        }
+
+        async function printSelectedLabels() {
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked'));
+            if (selected.length === 0) {
+                alert('Please select at least one order');
+                return;
+            }
+
+            const orderIds = selected.map(cb => parseInt(cb.dataset.orderId));
+
+            try {
+                const response = await fetch('/Admin/Order/BulkPrintLabels', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderIds: orderIds })
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(html);
+                    printWindow.document.close();
+                } else {
+                    alert('Failed to generate labels. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating labels.');
+            }
+        }
+
+        async function changeBulkStatus(newStatus) {
+            if (!newStatus) return;
+
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked'));
+            if (selected.length === 0) {
+                alert('Please select at least one order');
+                document.getElementById('bulkStatusChange').value = '';
+                return;
+            }
+
+            const orderIds = selected.map(cb => parseInt(cb.dataset.orderId));
+            const orderNumbers = selected.map(cb => cb.dataset.orderNumber).join(', ');
+
+            if (!confirm(`Change status of ${orderIds.length} order(s) to "${newStatus}"?\n\nOrders: ${orderNumbers}`)) {
+                document.getElementById('bulkStatusChange').value = '';
+                return;
+            }
+
+            try {
+                const response = await fetch('/Admin/Order/BulkUpdateStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    },
+                    body: JSON.stringify({
+                        orderIds: orderIds,
+                        newStatus: newStatus
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Status updated successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Failed to update status. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+
+            document.getElementById('bulkStatusChange').value = '';
+        }
+    </script>
+}

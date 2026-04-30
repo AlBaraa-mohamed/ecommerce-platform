@@ -1,0 +1,113 @@
+@model EcommercePlatform.Domain.Entities.Product
+@{
+    ViewData["Title"] = "Product Details";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="mb-4">
+    <h2><i class="bi bi-box-seam"></i> Product Details</h2>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="@(string.IsNullOrEmpty(Model.PrimaryImageUrl) ? "https://placehold.co/400x400/e9ecef/6c757d?text=No+Image" : Model.PrimaryImageUrl)" 
+                             alt="@Model.Name" 
+                             class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-8">
+                        <h3>@Model.Name</h3>
+                        <p class="text-muted">SKU: @Model.SKU</p>
+                        <h4 class="text-primary">$@Model.Price.ToString("N2")</h4>
+
+                        <div class="mb-3">
+                            <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary") me-2">
+                                @(Model.IsActive ? "Active" : "Inactive")
+                            </span>
+                            <span class="badge bg-secondary me-2">
+                                @Model.Type
+                            </span>
+                            @if (Model.Size.HasValue)
+                            {
+                                <span class="badge bg-info me-2">
+                                    Size: @Model.Size
+                                </span>
+                            }
+                            <span class="badge @(Model.Available > 10 ? "bg-success" : Model.Available > 0 ? "bg-warning" : "bg-danger")">
+                                Available: @Model.Available
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <h6>Description</h6>
+                            <p>@Model.Description</p>
+                        }
+
+                        <div class="mt-4">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Edit Product
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Information</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td><strong>Product ID:</strong></td>
+                        <td>@Model.Id</td>
+                    </tr>
+                    <tr>
+                        <td><strong>On Hand:</strong></td>
+                        <td>@Model.OnHand</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reserved:</strong></td>
+                        <td>@Model.Reserved</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Available:</strong></td>
+                        <td>@Model.Available</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="Inventory" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-archive"></i> Manage Inventory
+                    </a>
+                    <a href="@Url.Action("Product", "Home", new { area = "", id = Model.Id })" target="_blank" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-eye"></i> View on Store
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

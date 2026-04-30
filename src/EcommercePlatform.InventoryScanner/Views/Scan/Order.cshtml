@@ -1,0 +1,84 @@
+@model EcommercePlatform.Domain.Entities.Order
+@{
+    ViewData["Title"] = $"Order {Model.OrderNumber}";
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <h4>@Model.OrderNumber</h4>
+    <span class="badge bg-secondary fs-6">@Model.Status</span>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <strong>@Model.CustomerName</strong> - @Model.CustomerPhone<br />
+        <small class="text-muted">@Model.ShippingAddress, @Model.ShippingCity</small>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#deliveryTab">Delivery</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#returnTab">Return</a></li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="deliveryTab">
+        <form asp-controller="Scan" asp-action="UpdateDelivery" method="post">
+            <input type="hidden" name="orderId" value="@Model.Id" />
+            @foreach (var line in Model.LineItems)
+            {
+                <input type="hidden" name="lineItemIds" value="@line.Id" />
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>@line.ProductNameSnapshot</strong><br />
+                                <small>SKU: @line.SKUSnapshot</small>
+                            </div>
+                            <div class="text-end">
+                                <small>Ordered: @line.OrderedQuantity</small><br />
+                                <small>Delivered: @line.DeliveredQuantity</small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label">Delivered Qty:</label>
+                            <input type="number" name="deliveredQuantities" class="form-control"
+                                   value="@line.DeliveredQuantity" min="@line.DeliveredQuantity" max="@line.OrderedQuantity" />
+                        </div>
+                    </div>
+                </div>
+            }
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">Update Delivery</button>
+        </form>
+    </div>
+    <div class="tab-pane fade" id="returnTab">
+        <form asp-controller="Scan" asp-action="UpdateReturn" method="post">
+            <input type="hidden" name="orderId" value="@Model.Id" />
+            @foreach (var line in Model.LineItems)
+            {
+                <input type="hidden" name="lineItemIds" value="@line.Id" />
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>@line.ProductNameSnapshot</strong><br />
+                                <small>SKU: @line.SKUSnapshot</small>
+                            </div>
+                            <div class="text-end">
+                                <small>Delivered: @line.DeliveredQuantity</small><br />
+                                <small>Returned: @line.ReturnedQuantity</small>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label">Returned Qty:</label>
+                            <input type="number" name="returnedQuantities" class="form-control"
+                                   value="@line.ReturnedQuantity" min="@line.ReturnedQuantity" max="@line.DeliveredQuantity" />
+                        </div>
+                    </div>
+                </div>
+            }
+            <button type="submit" class="btn btn-warning btn-lg w-100 mt-2">Update Return</button>
+        </form>
+    </div>
+</div>
+
+<a href="/Scan" class="btn btn-outline-secondary w-100 mt-3"><i class="bi bi-arrow-left"></i> Scan Another</a>

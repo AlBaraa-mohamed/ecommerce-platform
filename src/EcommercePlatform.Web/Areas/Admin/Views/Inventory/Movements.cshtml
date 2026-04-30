@@ -1,0 +1,49 @@
+@model List<EcommercePlatform.Domain.Entities.StockMovement>
+@{
+    ViewData["Title"] = "Stock Movements";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between mb-4">
+    <h2>Stock Movements @(ViewBag.ProductId != null ? $"(Product #{ViewBag.ProductId})" : "")</h2>
+    <a href="/Admin/Inventory" class="btn btn-outline-secondary">Back to Inventory</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover table-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Qty</th>
+                <th>Notes</th>
+                <th>By</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Model)
+            {
+                <tr>
+                    <td>@m.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                    <td>@m.Product?.Name</td>
+                    <td>
+                        @{
+                            var typeClass = m.MovementType switch {
+                                EcommercePlatform.Domain.Entities.MovementType.Receive => "bg-success",
+                                EcommercePlatform.Domain.Entities.MovementType.Deliver => "bg-primary",
+                                EcommercePlatform.Domain.Entities.MovementType.Return => "bg-warning",
+                                EcommercePlatform.Domain.Entities.MovementType.Adjustment => "bg-info",
+                                _ => "bg-secondary"
+                            };
+                        }
+                        <span class="badge @typeClass">@m.MovementType</span>
+                    </td>
+                    <td>@m.Quantity</td>
+                    <td>@m.Notes</td>
+                    <td>@m.CreatedByUserId</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Scan QR Code";
+}
+
+<h4 class="mb-3"><i class="bi bi-upc-scan"></i> Scan Order QR Code</h4>
+
+<div id="scanResult" class="alert alert-info d-none"></div>
+
+<div class="card mb-3">
+    <div class="card-body p-0">
+        <video id="preview" class="w-100" autoplay playsinline></video>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Or enter order number manually:</label>
+    <div class="input-group">
+        <input type="text" id="manualOrderNumber" class="form-control form-control-lg" placeholder="ORD-00001" />
+        <button class="btn btn-primary" onclick="goToOrder()">Go</button>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+const video = document.getElementById('preview');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+let scanning = true;
+
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+        video.srcObject = stream;
+        video.play();
+        requestAnimationFrame(scan);
+    })
+    .catch(() => {
+        document.getElementById('scanResult').classList.remove('d-none');
+        document.getElementById('scanResult').textContent = 'Camera not available. Use manual entry.';
+    });
+
+function scan() {
+    if (!scanning) return;
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+            scanning = false;
+            window.location.href = '/Scan/Order?orderNumber=' + encodeURIComponent(code.data);
+        }
+    }
+    requestAnimationFrame(scan);
+}
+
+function goToOrder() {
+    const val = document.getElementById('manualOrderNumber').value.trim();
+    if (val) window.location.href = '/Scan/Order?orderNumber=' + encodeURIComponent(val);
+}
+</script>
+}

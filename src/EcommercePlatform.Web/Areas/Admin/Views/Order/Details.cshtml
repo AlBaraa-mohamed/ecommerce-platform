@@ -1,0 +1,111 @@
+@model EcommercePlatform.Domain.Entities.Order
+@{
+    ViewData["Title"] = $"Order {Model.OrderNumber}";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <h2>Order: @Model.OrderNumber</h2>
+    <div>
+        <a href="/Admin/Order/Label/@Model.Id" class="btn btn-outline-secondary"><i class="bi bi-tag"></i> Print Label</a>
+        <a href="/Admin/Order" class="btn btn-outline-secondary ms-2">Back</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6>Customer Info</h6></div>
+            <div class="card-body">
+                <p><strong>Name:</strong> @Model.CustomerName</p>
+                <p><strong>Phone:</strong> @Model.CustomerPhone</p>
+                <p><strong>Email:</strong> @Model.CustomerEmail</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h6>Shipping Address</h6></div>
+            <div class="card-body">
+                <p>@Model.ShippingAddress</p>
+                <p>@Model.ShippingCity, @Model.ShippingState @Model.ShippingPostalCode</p>
+                <p>@Model.ShippingCountry</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+        <h6>Line Items</h6>
+        <span class="badge bg-secondary">@Model.Status</span>
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr><th>Product</th><th>SKU</th><th>Unit Price</th><th>Ordered</th><th>Delivered</th><th>Returned</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Model.LineItems)
+                {
+                    <tr>
+                        <td>@line.ProductNameSnapshot</td>
+                        <td><code>@line.SKUSnapshot</code></td>
+                        <td>$@line.UnitPrice.ToString("F2")</td>
+                        <td>@line.OrderedQuantity</td>
+                        <td>@line.DeliveredQuantity</td>
+                        <td>@line.ReturnedQuantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="card mb-4">
+        <div class="card-header"><h6>Update Status</h6></div>
+        <div class="card-body">
+            <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post" class="row g-3">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="col-md-4">
+                    <select name="status" class="form-select">
+                        @foreach (EcommercePlatform.Domain.Entities.OrderStatus s in Enum.GetValues(typeof(EcommercePlatform.Domain.Entities.OrderStatus)))
+                        {
+                            <option value="@s" selected="@(s == Model.Status)">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="notes" class="form-control" placeholder="Notes (optional)" />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-warning w-100">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header"><h6>Order History</h6></div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr><th>Event</th><th>Description</th><th>By</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in Model.Events.OrderByDescending(e => e.CreatedAt))
+                {
+                    <tr>
+                        <td><span class="badge bg-secondary">@ev.EventType</span></td>
+                        <td>@ev.Description</td>
+                        <td>@ev.CreatedByUserId</td>
+                        <td>@ev.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

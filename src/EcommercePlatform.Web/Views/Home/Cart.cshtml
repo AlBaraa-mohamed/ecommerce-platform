@@ -1,0 +1,48 @@
+@model List<EcommercePlatform.Web.Models.CartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<h2><i class="bi bi-cart3"></i> Shopping Cart</h2>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x fs-1 text-muted"></i>
+        <p class="mt-2 text-muted">Your cart is empty.</p>
+        <a href="/" class="btn btn-primary">Continue Shopping</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Product ID</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>Product #@item.ProductId</td>
+                        <td>@item.Quantity</td>
+                        <td>
+                            <form asp-action="RemoveFromCart" method="post" class="d-inline">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-between mt-3">
+        <a href="/" class="btn btn-outline-secondary">Continue Shopping</a>
+        <a href="/Home/Checkout" class="btn btn-success"><i class="bi bi-credit-card"></i> Proceed to Checkout</a>
+    </div>
+}

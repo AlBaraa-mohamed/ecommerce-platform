@@ -1,0 +1,259 @@
+@model IEnumerable<EcommercePlatform.Domain.Entities.Product>
+@{
+    ViewData["Title"] = "1999 - Premium Footwear & Fashion";
+    var shoes = Model.Where(p => p.Type == EcommercePlatform.Domain.Entities.ProductType.Shoes).ToList();
+    var clothing = Model.Where(p => p.Type == EcommercePlatform.Domain.Entities.ProductType.Clothing).ToList();
+    var accessories = Model.Where(p => p.Type == EcommercePlatform.Domain.Entities.ProductType.Accessories).ToList();
+}
+
+<!-- Hero Section with 1999 Branding -->
+<section class="hero-section-1999">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 hero-content">
+                <div class="luxury-logo-container mb-4">
+                    <div class="golden-circle">
+                        <span class="brand-1999">1999</span>
+                    </div>
+                </div>
+                <span class="hero-badge-luxury">Exclusive Collection 2024</span>
+                <h1 class="hero-title-luxury">Timeless <span class="text-gradient-gold">Elegance</span></h1>
+                <p class="hero-subtitle-luxury">Experience the pinnacle of luxury fashion. Where premium craftsmanship meets contemporary design in perfect harmony.</p>
+                <div class="hero-buttons">
+                    <a href="#products" class="btn btn-luxury btn-lg px-4 me-3">
+                        <i class="bi bi-bag"></i> Explore Collection
+                    </a>
+                    <a href="#new-arrivals" class="btn btn-luxury-outline btn-lg px-4">
+                        New Arrivals
+                    </a>
+                </div>
+                <div class="hero-stats mt-4">
+                    <div class="stat-item-luxury">
+                        <h3>@Model.Count()+</h3>
+                        <p>Premium Items</p>
+                    </div>
+                    <div class="stat-item-luxury">
+                        <h3>@shoes.Count</h3>
+                        <p>Exclusive Shoes</p>
+                    </div>
+                    <div class="stat-item-luxury">
+                        <h3>100%</h3>
+                        <p>Authentic</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-image-container">
+                <div class="hero-image-wrapper-luxury">
+                    <div class="floating-card-luxury card-1">
+                        <i class="bi bi-lightning-charge"></i>
+                        <span>Express Delivery</span>
+                    </div>
+                    <div class="floating-card-luxury card-2">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Authenticity Guaranteed</span>
+                    </div>
+                    <div class="floating-card-luxury card-3">
+                        <i class="bi bi-award"></i>
+                        <span>Premium Quality</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Showcase -->
+<section class="category-section">
+    <div class="container">
+        <div class="text-center mb-5 fade-in">
+            <h2 class="section-title">Shop By Category</h2>
+            <p class="section-subtitle">Find your perfect style in our curated collections</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 category-card-wrapper">
+                <a href="#shoes-section" class="category-card">
+                    <div class="category-image">
+                        <i class="bi bi-droplet" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3>Footwear</h3>
+                    <p>@shoes.Count styles available</p>
+                    <span class="category-arrow">→</span>
+                </a>
+            </div>
+            <div class="col-md-4 category-card-wrapper">
+                <a href="#clothing-section" class="category-card">
+                    <div class="category-image">
+                        <i class="bi bi-bag" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3>Clothing</h3>
+                    <p>@clothing.Count items available</p>
+                    <span class="category-arrow">→</span>
+                </a>
+            </div>
+            <div class="col-md-4 category-card-wrapper">
+                <a href="#accessories-section" class="category-card">
+                    <div class="category-image">
+                        <i class="bi bi-watch" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3>Accessories</h3>
+                    <p>@accessories.Count items available</p>
+                    <span class="category-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Shoes -->
+@if (shoes.Any())
+{
+    <section class="products-section" id="shoes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Premium Footwear</h2>
+                <p class="section-subtitle">Step into comfort and style</p>
+            </div>
+            <div class="row g-4">
+                @foreach (var product in shoes.Take(8))
+                {
+                    <div class="col-6 col-md-4 col-lg-3 product-card-wrapper">
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <a href="@Url.Action("Product", "Home", new { id = product.Id })">
+                                    <img src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "https://placehold.co/400x400/16213e/d4af37?text=" + Uri.EscapeDataString("👟") : product.PrimaryImageUrl)" 
+                                         class="product-image" 
+                                         alt="@product.Name">
+                                </a>
+                                @if (product.Available <= 3 && product.Available > 0)
+                                {
+                                    <span class="product-badge badge-warning">Low Stock</span>
+                                }
+                                else if (product.Available == 0)
+                                {
+                                    <span class="product-badge badge-sold">Sold Out</span>
+                                }
+                                <div class="product-overlay">
+                                    <a href="@Url.Action("Product", "Home", new { id = product.Id })" class="btn btn-light btn-sm">
+                                        <i class="bi bi-eye"></i> Quick View
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-category">
+                                    @product.Type
+                                    @if (product.Size.HasValue)
+                                    {
+                                        <span class="size-badge">EU @product.Size</span>
+                                    }
+                                </div>
+                                <h5 class="product-title">
+                                    <a href="@Url.Action("Product", "Home", new { id = product.Id })">@product.Name</a>
+                                </h5>
+                                <div class="product-footer">
+                                    <span class="product-price">$@product.Price.ToString("N2")</span>
+                                    @if (product.Available > 0)
+                                    {
+                                        <form asp-controller="Home" asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                            <input type="hidden" name="productId" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn-add-cart">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn-add-cart" disabled>
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- All Products -->
+<section class="products-section" id="products">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">All Products</h2>
+            <p class="section-subtitle">Complete collection</p>
+        </div>
+        <div class="row g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3 product-card-wrapper">
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <a href="@Url.Action("Product", "Home", new { id = product.Id })">
+                                <img src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "https://placehold.co/400x400/16213e/d4af37?text=" + Uri.EscapeDataString("✨") : product.PrimaryImageUrl)" 
+                                     class="product-image"
+                                     alt="@product.Name">
+                            </a>
+                            @if (product.Available <= 3 && product.Available > 0)
+                            {
+                                <span class="product-badge badge-warning">Low Stock</span>
+                            }
+                            else if (product.Available == 0)
+                            {
+                                <span class="product-badge badge-sold">Sold Out</span>
+                            }
+                            <div class="product-overlay">
+                                <a href="@Url.Action("Product", "Home", new { id = product.Id })" class="btn btn-light btn-sm">
+                                    <i class="bi bi-eye"></i> Quick View
+                                </a>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-category">
+                                @product.Type
+                                @if (product.Size.HasValue)
+                                {
+                                    <span class="size-badge">EU @product.Size</span>
+                                }
+                            </div>
+                            <h5 class="product-title">
+                                <a href="@Url.Action("Product", "Home", new { id = product.Id })">@product.Name</a>
+                            </h5>
+                            <div class="product-footer">
+                                <span class="product-price">$@product.Price.ToString("N2")</span>
+                                @if (product.Available > 0)
+                                {
+                                    <form asp-controller="Home" asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn-add-cart">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn-add-cart" disabled>
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="empty-state">
+        <div class="container text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 5rem; color: #dee2e6;"></i>
+            <h3 class="mt-4">No Products Available</h3>
+            <p class="text-muted">Check back soon for amazing new arrivals!</p>
+        </div>
+    </section>
+}
