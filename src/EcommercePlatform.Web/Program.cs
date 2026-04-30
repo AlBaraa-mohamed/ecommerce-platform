@@ -43,10 +43,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapControllerRoute(
     name: "areas",
@@ -57,10 +57,18 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await DbSeeder.SeedAsync(db, userManager, roleManager);
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await DbSeeder.SeedAsync(db, userManager, roleManager);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
 }
 
 app.Run();
