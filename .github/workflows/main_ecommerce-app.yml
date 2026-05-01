@@ -14,8 +14,6 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
-    env:
-      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 
     steps:
       - uses: actions/checkout@v4
@@ -27,15 +25,6 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build EcommercePlatform.sln --configuration Release
-
-      - name: Install EF Core tools
-        run: dotnet tool install --global dotnet-ef --version 8.0.0
-
-      - name: Run database migrations
-        if: ${{ env.DB_CONNECTION_STRING != '' }}
-        env:
-          ConnectionStrings__DefaultConnection: ${{ env.DB_CONNECTION_STRING }}
-        run: dotnet-ef database update --project src/EcommercePlatform.Infrastructure --startup-project src/EcommercePlatform.Web
 
       - name: dotnet publish Web
         run: dotnet publish src/EcommercePlatform.Web/EcommercePlatform.Web.csproj -c Release -o "${{env.DOTNET_ROOT}}/web-app"
@@ -67,6 +56,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: web-app
+          path: ./web-app-artifact
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -75,24 +73,31 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C167ABF3D0DB468E9D679A1552FC3C6E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_66AAEA3A242C4410A9B58BF138EA7BAD }}
 
+      - name: Get DefaultConnection from Azure App Service
+        run: |
+          RG=$(az webapp list --query "[?name=='ecommerce-app'].resourceGroup | [0]" -o tsv)
+          CONN_STR=$(az webapp config connection-string list \
+            --name ecommerce-app \
+            --resource-group "$RG" \
+            --query "[?name=='DefaultConnection'].value | [0]" -o tsv)
+          echo "::add-mask::$CONN_STR"
+          echo "DEFAULT_CONNECTION=$CONN_STR" >> $GITHUB_ENV
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef --version 8.0.0
+
+      - name: Run database migrations
+        env:
+          ConnectionStrings__DefaultConnection: ${{ env.DEFAULT_CONNECTION }}
+        run: dotnet-ef database update --project src/EcommercePlatform.Infrastructure --startup-project src/EcommercePlatform.Web
+
       - name: Deploy Web to Azure Web App
         id: deploy-web-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'ecommerce-app'
           slot-name: 'Production'
-          package: .
-
-      - name: Configure connection string on Azure App Service
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            RG=$(az webapp list --query "[?name=='ecommerce-app'].resourceGroup | [0]" -o tsv)
-            az webapp config connection-string set \
-              --name ecommerce-app \
-              --resource-group "$RG" \
-              --settings DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
-              --connection-string-type SQLAzure
+          package: ./web-app-artifact
 
   deploy-inventory-scanner:
     runs-on: windows-latest
@@ -121,14 +126,4 @@ jobs:
           app-name: 'ecommerce-inventory-scanner'
           slot-name: 'Production'
           package: .
-
-      - name: Configure connection string on Azure App Service
-        shell: bash
-        run: |
-          RG=$(az webapp list --query "[?name=='ecommerce-inventory-scanner'].resourceGroup | [0]" -o tsv)
-          az webapp config connection-string set \
-            --name ecommerce-inventory-scanner \
-            --resource-group "$RG" \
-            --settings DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
-            --connection-string-type SQLAzure
           
