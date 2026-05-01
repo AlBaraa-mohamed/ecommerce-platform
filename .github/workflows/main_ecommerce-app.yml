@@ -87,9 +87,10 @@ jobs:
         uses: azure/CLI@v2
         with:
           inlineScript: |
+            RG=$(az webapp list --query "[?name=='ecommerce-app'].resourceGroup | [0]" -o tsv)
             az webapp config connection-string set \
               --name ecommerce-app \
-              --resource-group $(az webapp show --name ecommerce-app --query resourceGroup -o tsv) \
+              --resource-group "$RG" \
               --settings DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
               --connection-string-type SQLAzure
 
@@ -120,4 +121,14 @@ jobs:
           app-name: 'ecommerce-inventory-scanner'
           slot-name: 'Production'
           package: .
+
+      - name: Configure connection string on Azure App Service
+        shell: bash
+        run: |
+          RG=$(az webapp list --query "[?name=='ecommerce-inventory-scanner'].resourceGroup | [0]" -o tsv)
+          az webapp config connection-string set \
+            --name ecommerce-inventory-scanner \
+            --resource-group "$RG" \
+            --settings DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
+            --connection-string-type SQLAzure
           
